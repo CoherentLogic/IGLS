@@ -13,6 +13,10 @@ CLEAR
  D ESC("[2J")
  Q
 
+HOME
+ D LOCATE(24,80)
+ Q
+
 SCROLLREGION(TOP,BOTTOM)
  N ES S ES="["_TOP_";"_BOTTOM_"r"
  D ESC(ES)
@@ -65,6 +69,11 @@ LOCATE(ROW,COL)
  Q
 
 INIT
+ D INIT^%TERMIO
+ S G0=$C(27)_"(B"
+ S G1=$C(27)_"(0"
+ S BOX("UL")=G1_"l"_G0,BOX("UR")=G1_"k"_G0,BOX("LL")=G1_"m"_G0,BOX("LR")=G1_"j"_G0
+ S BOX("LT")=G1_"t"_G0,BOX("RT")=G1_"u"_G0,BOX("V")=G1_"x"_G0,BOX("H")=G1_"q"_G0
  S SCRAT("RESET")=0
  S SCRAT("BRIGHT")=1
  S SCRAT("DIM")=2
