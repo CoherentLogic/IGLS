@@ -5,6 +5,7 @@
  ; Equivalent to getch() in [n]curses
  ;  EVENT: Return structure (by reference)
  ;   EVENT("IS_SPECIAL")=0|1 (where 1 means this is a special key)
+ ;   EVENT("READ_TERMINATOR")="string" (string that terminated read)
  ;
 GETCH(EVENT)
  N TMP,ZB,RETVAL
@@ -31,15 +32,14 @@ GETSTR(CODE)
  ;  VPOS: Row
  ;
 GOTO(HPOS,VPOS)
- N PA S PA(1)=VPOS,PA(2)=HPOS
- D ^PARAM($$GETSTR("cm"),.PA)
- D
+ N PA,OUT S PA(1)=VPOS,PA(2)=HPOS,OUT=""
+ Q $$PARAM($$GETSTR("cm"),.PA)
  ;
  ; INITSCR
  ; Must be called first. Initializes memory data structures for
  ; terminal I/O.
  ;
-INITSCR
+INIT
  N TC,TN
  ; 
  ; Get environment variable and read in term def.
@@ -58,6 +58,11 @@ INITSCR
  ; Set up %IOKB for special key lookup.  
  ; Used by $$GETCH.
  ;
+ S %IOKB(9)="KEY_TAB"
+ S %IOKB($C(27)_"[A")="KEY_UP"
+ S %IOKB($C(27)_"[B")="KEY_DOWN"
+ S %IOKB($C(27)_"[D")="KEY_LEFT"
+ S %IOKB($C(27)_"[C")="KEY_RIGHT"
  S %IOKB($$GETSTR("kd"))="KEY_DOWN"
  S %IOKB($$GETSTR("ku"))="KEY_UP"
  S %IOKB($$GETSTR("kl"))="KEY_LEFT"
@@ -81,27 +86,28 @@ INITSCR
  ; Inserts parameters into CODE and returns expanded string.
  ;  CODE: capability code (by value)
  ;  PA: params array (by reference)
- ;    PA(n,paramValue)
+ ;    PA(n)=paramValue
  ;
 PARAM(CODE,PA)
  N OUTSTR S OUTSTR=""	
- N PARMIDX S PARMIDX=1	; index of current param
  ;
  ; We don't need to expand params if PA(1) is empty.
  ;
  I $G(PA(1))="" S OUTSTR=CODE Q OUTSTR
- ; 
- ; Flags for the parameter alteration sequences
  ;
- N FLG,CTR S CTR=0	; counter for increment, transpose
- S FLG("INCREMENT")=0	; increment next two params
- S FLG("TRANSPOSE")=0 	; transpose next two params
- S FLG("SKIP")=0	; skip next one param with no output
- ;
- N LEN S LEN=$L(CODE)
- F I=1:1:L  D
- . S C=$E(CODE,I,I)
- . I 
+ N LEN,C S LEN=$L(CODE),C=""
+ N CHARIDX,PARMIDX S (CHARIDX,PARMIDX)=1
+ F  Q:CHARIDX>LEN  D
+ . S C=$E(CODE,CHARIDX)
+ . I C="%" D
+ . . S C=$E(CODE,CHARIDX+1)
+ . . S CHARIDX=CHARIDX+2
+ . . I C="%" S OUTSTR=OUTSTR_"%"
+ . . I C="i" S PA(PARMIDX)=PA(PARMIDX)+1,PA(PARMIDX+1)=PA(PARMIDX+1)+1
+ . . I C="r" D PARMSWAP(.PA,PARMIDX,PARMIDX+1)
+ . . I C="d" S OUTSTR=OUTSTR_PA(PARMIDX) S PARMIDX=PARMIDX+1
+ . . S C=""
+ . E  S OUTSTR=OUTSTR_C,CHARIDX=CHARIDX+1
  Q OUTSTR
  ;
  ; Swap the values at nodes PA(P1) and PA(P2)

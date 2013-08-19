@@ -63,9 +63,11 @@ ERASEUP
 
 
 LOCATE(ROW,COL)
+ N PA,CODE,RESULT S CODE=$$GETSTR^%TERMIO("cm")
+ S ROW=ROW-1,COL=COL-1
  S $X=COL,$Y=ROW
- N ES S ES="["_ROW_";"_COL_"H"
- D ESC(ES)
+ S PA(1)=ROW,PA(2)=COL
+ W $$PARAM^%TERMIO(CODE,.PA)
  Q
 
 INIT
@@ -74,6 +76,7 @@ INIT
  S G1=$C(27)_"(0"
  S BOX("UL")=G1_"l"_G0,BOX("UR")=G1_"k"_G0,BOX("LL")=G1_"m"_G0,BOX("LR")=G1_"j"_G0
  S BOX("LT")=G1_"t"_G0,BOX("RT")=G1_"u"_G0,BOX("V")=G1_"x"_G0,BOX("H")=G1_"q"_G0
+ S SHADOW=G1_"a"_G0
  S SCRAT("RESET")=0
  S SCRAT("BRIGHT")=1
  S SCRAT("DIM")=2
