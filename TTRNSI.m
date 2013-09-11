@@ -76,6 +76,7 @@ INIT
  S G1=$C(27)_"(0"
  S BOX("UL")=G1_"l"_G0,BOX("UR")=G1_"k"_G0,BOX("LL")=G1_"m"_G0,BOX("LR")=G1_"j"_G0
  S BOX("LT")=G1_"t"_G0,BOX("RT")=G1_"u"_G0,BOX("V")=G1_"x"_G0,BOX("H")=G1_"q"_G0
+ S BOX("X")=G1_"n"_G0,BOX("TT")=G1_"w"_G0,BOX("BT")=G1_"v"_G0
  S SHADOW=G1_"a"_G0
  S SCRAT("RESET")=0
  S SCRAT("BRIGHT")=1

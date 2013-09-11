@@ -9,7 +9,7 @@
  ;
 GETCH(EVENT)
  N TMP,ZB,RETVAL
- U $P:ESC
+ U $P:(ESC:FLUSH)
  R *TMP S ZB=$ZB
  I $G(%IOKB(ZB))'="" D 
  . S EVENT("IS_SPECIAL")=1,RETVAL=$G(%IOKB(ZB))
@@ -58,7 +58,9 @@ INIT
  ; Set up %IOKB for special key lookup.  
  ; Used by $$GETCH.
  ;
- S %IOKB(9)="KEY_TAB"
+ S %IOKB($C(27,27))="KEY_ESC"
+ S %IOKB($C(9))="KEY_TAB"
+ S %IOKB($C(13))="KEY_ENTER"
  S %IOKB($C(27)_"[A")="KEY_UP"
  S %IOKB($C(27)_"[B")="KEY_DOWN"
  S %IOKB($C(27)_"[D")="KEY_LEFT"
