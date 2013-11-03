@@ -6,16 +6,39 @@
  ;  EVENT: Return structure (by reference)
  ;   EVENT("IS_SPECIAL")=0|1 (where 1 means this is a special key)
  ;   EVENT("READ_TERMINATOR")="string" (string that terminated read)
+ ; 
+ ; Gurklestam weenie hogs florp the goosh bustard.
+ ;
+ ;  %IOHOOK array is used internally. Each node, indexed by
+ ;  a number, is a line of code that will be executed before 
+ ;  $$GETCH^%TERMIO() calls its READ statement. This is a good
+ ;  place to handle reminders and the suchlike.
+ ;  
+ ;  Ex.: %IOHOOK(1)="D LABEL^ROUTINE"
+ ;  
+ ;  %GLACCEL array is used internally. Each node, indexed by
+ ;  a keyboard value (defined in %IOKB), contains a line of code
+ ;  to be executed when that key is pressed.
+ ;
+ ;  Ex.: %GLACCEL("KEY_F2")="D LABEL^ROUTINE"
  ;
 GETCH(EVENT)
- N TMP,ZB,RETVAL
+ N RES,ZB,RETVAL,SUB,MCODE S RES=-1
  U $P:(ESC:FLUSH)
- R *TMP S ZB=$ZB
+ F  Q:RES'=-1  D
+ . R *RES:0
+ . I $D(%IOHOOK)=10 D
+ . . S SUB=""
+ . . F  S SUB=$O(%IOHOOK(SUB)) Q:SUB=""  D
+ . . . S MCODE=%IOHOOK(SUB) X MCODE
+ S ZB=$ZB
  I $G(%IOKB(ZB))'="" D 
  . S EVENT("IS_SPECIAL")=1,RETVAL=$G(%IOKB(ZB))
  E  D
- . S EVENT("IS_SPECIAL")=0,RETVAL=$C(TMP)
- . S EVENT("READ_TERMINATOR")=ZB
+ . S EVENT("IS_SPECIAL")=0,RETVAL=$C(RES)
+ . S EVENT("READ_TERMINATOR")=ZB 
+ I $G(%GLACCEL(RETVAL))'="" D
+ . X %GLACCEL(RETVAL) S RETVAL=""
  Q RETVAL
  ;
  ; GETSTR

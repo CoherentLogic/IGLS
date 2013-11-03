@@ -135,3 +135,14 @@ DAYOFWEEK(DATE)
  S DMY=DMY+CENT
  Q DMY#7
 
+CURHOUR()
+ Q $ZD($H,"12")
+
+CURMIN()
+ Q $ZD($H,"60")
+
+CURSEC()
+ Q $ZD($H,"SS")
+
+CURAMPM() 
+ Q $ZD($H,"AM")
