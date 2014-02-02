@@ -17,7 +17,7 @@
  ;  Ex.: %IOHOOK(1)="D LABEL^ROUTINE"
  ;  
  ;  %GLACCEL array is used internally. Each node, indexed by
- ;  a keyboard value (defined in %IOKB), contains a line of code
+ ;  a keyboard valueErr^%zewd (defined in %IOKB), contains a line of code
  ;  to be executed when that key is pressed.
  ;
  ;  Ex.: %GLACCEL("KEY_F2")="D LABEL^ROUTINE"
@@ -41,6 +41,21 @@ GETCH(EVENT)
  . X %GLACCEL(RETVAL) S RETVAL=""
  Q RETVAL
  ;
+ ; ADDACCEL
+ ; Add a global accelerator to GETCH's table
+ ;
+ADDACCEL(KEYEVT,MCODE,KEYNAME,DESC)
+ S %GLACCEL(KEYEVT)=MCODE
+ S %GLACCEL(KEYEVT,"DESC")=$G(DESC,"[NO DESCRIPTION]")
+ S %GLACCEL(KEYEVT,"NAME")=KEYNAME
+ Q
+ ;
+KBHELP
+ N BINDING S BINDING="" 
+ F  S BINDING=$O(%GLACCEL(BINDING)) Q:BINDING=""  D
+ . W $J(%GLACCEL(BINDING,"NAME"),10),": ",%GLACCEL(BINDING,"DESC"),!
+ Q
+ ;
  ; GETSTR
  ; Equivalent to tgetstr() in termcap library
  ;  CODE: capability code (by value)
@@ -63,12 +78,17 @@ GOTO(HPOS,VPOS)
  ; terminal I/O.
  ;
 INIT
- N TC,TN
+ N TC,TN,OS
+ S OS=$P($ZV," ",3,3)
  ; 
  ; Get environment variable and read in term def.
  ; 
- S TERM=$ZTRNLNM("TERM")
- G:TERM="" NOTERM	; TERM wasn't set. Error out.
+ I OS'="VMS" D
+ . S TERM=$ZTRNLNM("TERM")
+ E  D
+ . I $ZGETDVI($P,"DECCRT")=1
+ . . S TERM="vt100"
+ G:TERM="" NOTERM	; TERM wasn't set. Error out. 
  M %IOCAP=^%IOCAP("TERMCAP",TERM)
  ;
  ; Merge in more specific capability strings indirected through
