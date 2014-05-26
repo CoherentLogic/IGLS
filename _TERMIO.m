@@ -78,17 +78,12 @@ GOTO(HPOS,VPOS)
  ; terminal I/O.
  ;
 INIT
- N TC,TN,OS
- S OS=$P($ZV," ",3,3)
+ N TC,TN
  ; 
  ; Get environment variable and read in term def.
  ; 
- I OS'="VMS" D
- . S TERM=$ZTRNLNM("TERM")
- E  D
- . I $ZGETDVI($P,"DECCRT")=1
- . . S TERM="vt100"
- G:TERM="" NOTERM	; TERM wasn't set. Error out. 
+ S TERM=$ZTRNLNM("TERM")
+ G:TERM="" NOTERM	; TERM wasn't set. Error out.
  M %IOCAP=^%IOCAP("TERMCAP",TERM)
  ;
  ; Merge in more specific capability strings indirected through
@@ -97,6 +92,12 @@ INIT
  S TN=%IOCAP("tc")
  M TC=^%IOCAP("TERMCAP",TN)
  M %IOCAP("tc")=TC
+ ;
+ ; Get screen dimensions (very clever hack from David Wicksell)
+ ;
+ ZSHOW "D":SCREEN
+ S %IOCAP("COLUMNS")=+$P(SCREEN("D",1),"WIDTH=",2)
+ S %IOCAP("ROWS")=+$P(SCREEN("D",1),"LENG=",2)
  ;
  ; Set up %IOKB for special key lookup.  
  ; Used by $$GETCH.
