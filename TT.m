@@ -3,6 +3,25 @@ TT
  S $ZDATEFORM=2
  D INIT
  N RESP
+ I $D(^TT("XKEYS"))'=10 D
+ . S ^TT("XKEYS","XKGLS")=""
+ . S ^TT("XKEYS","XKTC")=""
+ . S ^TT("XKEYS","XKADM")=""
+ . S ^TT("XKEYS","XKGLS")=""
+ . S ^TT("XKEYS","XKTC")=""
+ . S ^TT("XKEYS","XKADM")=""
+ . S ^TT("XKEYS","XKGLS")=""
+ . S ^TT("XKEYS","XKCST")=""
+ . S ^TT("XKEYS","XKTC")=""
+ . S ^TT("XKEYS","XKGLS")=""
+ . S ^TT("XKEYS","XKTC")=""
+ . S ^TT("XKEYS","XKADM")=""
+ . S ^TT("XKEYS","XKINV")=""
+ . S ^TT("XKEYS","XKGLS")=""
+ . S ^TT("XKEYS","XKINV")=""
+ . S ^TT("XKEYS","XKGLS")=""
+ . S ^TT("XKEYS","XKCST")=""
+ I $D(^TT("USERS"))'=10 D ADD^TTAUTH,GRANT^TTAUTH
 REAUTH
  I $G(TTAUTHED)'=1 D FAUTH^TTAUTH
  G:TTAUTHED=0 REAUTH
